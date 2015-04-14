@@ -92,8 +92,8 @@ class EEStackController(CementBaseController):
             except CommandExecutionError as e:
                 Log.error(self, "Failed to intialize postfix package")
 
-        if set(EEVariables.ee_mysql).issubset(set(apt_packages)):
             Log.info(self, "Adding repository for MySQL, please wait ...")
+        if set(EEVariables.ee_mysql).issubset(set(apt_packages)):
             mysql_pref = ("Package: *\nPin: origin mirror.aarnet.edu.au"
                           "\nPin-Priority: 1000\n")
             with open('/etc/apt/preferences.d/'
@@ -1295,6 +1295,13 @@ class EEStackController(CementBaseController):
                 Log.debug(self, "Setting apt_packages variable for MySQL")
                 if not EEShellExec.cmd_exec(self, "mysqladmin ping"):
                     apt_packages = apt_packages + EEVariables.ee_mysql
+                    packages = packages + [["https://raw."
+                                            "githubusercontent.com/"
+                                            "major/MySQLTuner-perl"
+                                            "/master/mysqltuner.pl",
+                                            "/usr/bin/mysqltuner",
+                                            "MySQLTuner"]]
+                    EEFileUtils.chmod(self, "/usr/bin/mysqltunner.pl", 0444)
                 else:
                     Log.debug(self, "MySQL connection is already alive")
                     Log.info(self, "MySQL connection is already alive")
