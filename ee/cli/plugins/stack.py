@@ -1301,7 +1301,7 @@ class EEStackController(CementBaseController):
                                             "/master/mysqltuner.pl",
                                             "/usr/bin/mysqltuner",
                                             "MySQLTuner"]]
-                    EEFileUtils.chmod(self, "/usr/bin/mysqltunner.pl", 0444)
+                    EEFileUtils.chmod(self, "/usr/bin/mysqltunner.pl", 0o775)
                 else:
                     Log.debug(self, "MySQL connection is already alive")
                     Log.info(self, "MySQL connection is already alive")
@@ -1480,6 +1480,7 @@ class EEStackController(CementBaseController):
         if self.app.pargs.mysql:
             Log.debug(self, "Removing apt_packages variable of MySQL")
             apt_packages = apt_packages + EEVariables.ee_mysql
+            packages = packages + ['/usr/bin/mysqltuner']
         if self.app.pargs.postfix:
             Log.debug(self, "Removing apt_packages variable of Postfix")
             apt_packages = apt_packages + EEVariables.ee_postfix
@@ -1576,6 +1577,7 @@ class EEStackController(CementBaseController):
         if self.app.pargs.mysql:
             Log.debug(self, "Purge apt_packages variable MySQL")
             apt_packages = apt_packages + EEVariables.ee_mysql
+            packages = packages + ['/usr/bin/mysqltuner']
         if self.app.pargs.postfix:
             Log.debug(self, "Purge apt_packages variable PostFix")
             apt_packages = apt_packages + EEVariables.ee_postfix
