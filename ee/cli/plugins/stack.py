@@ -1301,7 +1301,7 @@ class EEStackController(CementBaseController):
                                             "/master/mysqltuner.pl",
                                             "/usr/bin/mysqltuner",
                                             "MySQLTuner"]]
-                    EEFileUtils.chmod(self, "/usr/bin/mysqltunner.pl", 0o775)
+                    EEFileUtils.chmod(self, "/usr/bin/mysqltunner", 0o775)
                 else:
                     Log.debug(self, "MySQL connection is already alive")
                     Log.info(self, "MySQL connection is already alive")
