@@ -1,12 +1,14 @@
 """EasyEngine extarct core classes."""
 import tarfile
 import os
+from ee.core.logging import Log
 
 
 class EEExtract():
     """Method to extract from tar.gz file"""
 
     def extract(self, file, path):
+        """Function to extract tar.gz file"""
         try:
             tar = tarfile.open(file)
             tar.extractall(path=path)
@@ -14,6 +16,6 @@ class EEExtract():
             os.remove(file)
             return True
         except tarfile.TarError as e:
-            self.app.log.error('Unable to extract file \{0} {1}'
-                               .format(e.errno, e.strerror))
+            Log.debug(self, "{0}{1}".format(e.errno, e.strerror))
+            Log.error(self, 'Unable to extract file \{0}'.format(file))
             return False

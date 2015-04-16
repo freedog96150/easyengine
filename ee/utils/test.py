@@ -1,5 +1,4 @@
 """Testing utilities for EasyEngine."""
-
 from ee.cli.main import EETestApp
 from cement.utils.test import *
 

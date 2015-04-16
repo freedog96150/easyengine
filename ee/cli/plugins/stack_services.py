@@ -1,6 +1,8 @@
 from cement.core.controller import CementBaseController, expose
 from cement.core import handler, hook
 from ee.core.services import EEService
+from ee.core.logging import Log
+from ee.core.variables import EEVariables
 
 
 class EEStackStatusController(CementBaseController):
@@ -8,119 +10,187 @@ class EEStackStatusController(CementBaseController):
         label = 'stack_services'
         stacked_on = 'stack'
         stacked_type = 'embedded'
-        description = 'stack command manages stack operations'
+        description = 'Get status of stack'
         arguments = [
             (['--memcache'],
-                dict(help='start/stop/restart stack', action='store_true')),
+                dict(help='start/stop/restart memcache', action='store_true')),
             (['--dovecot'],
                 dict(help='start/stop/restart dovecot', action='store_true')),
             ]
 
-    @expose(help="start stack services")
+    @expose(help="Start stack services")
     def start(self):
+        """Start services"""
         services = []
         if self.app.pargs.nginx:
-            self.app.log.debug("nginx service start")
+            Log.debug(self, "nginx service start")
             services = services + ['nginx']
-        elif self.app.pargs.php:
-            self.app.log.debug("php5-fpm service start")
+        if self.app.pargs.php:
+            Log.debug(self, "php5-fpm service start")
             services = services + ['php5-fpm']
-        elif self.app.pargs.mysql:
-            self.app.log.debug("mysql service start")
-            services = services + ['mysql']
-        elif self.app.pargs.postfix:
-            self.app.log.debug("postfix service start")
+        if self.app.pargs.mysql:
+            if EEVariables.ee_mysql_host is "localhost":
+                Log.debug(self, "mysql service start")
+                services = services + ['mysql']
+            else:
+                Log.warn(self, "Remote MySQL found,"
+                         "unable to start MySQL service")
+        if self.app.pargs.postfix:
+            Log.debug(self, "postfix service start")
             services = services + ['postfix']
-        elif self.app.pargs.memcache:
-            self.app.log.debug("memcached service start")
+        if self.app.pargs.memcache:
+            Log.debug(self, "memcached service start")
             services = services + ['memcached']
-        elif self.app.pargs.dovecot:
-            self.app.log.debug("dovecot service start")
+        if self.app.pargs.dovecot:
+            Log.debug(self, "dovecot service start")
             services = services + ['dovecot']
-        else:
-            self.app.log.debug("nginx,php5-fpm,mysql,postfix services start")
+        if not services and EEVariables.ee_mysql_host is "localhost":
             services = services + ['nginx', 'php5-fpm', 'mysql', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,mysql,postfix services start")
+        elif not services:
+            services = services + ['nginx', 'php5-fpm', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,postfix services start")
+
         for service in services:
             EEService.start_service(self, service)
 
-    @expose(help="stop stack services")
+    @expose(help="Stop stack services")
     def stop(self):
+        """Stop services"""
         services = []
         if self.app.pargs.nginx:
-            self.app.log.debug("nginx service stop")
+            Log.debug(self, "nginx service stop")
             services = services + ['nginx']
-        elif self.app.pargs.php:
-            self.app.log.debug("php5-fpm service stop")
+        if self.app.pargs.php:
+            Log.debug(self, "php5-fpm service stop")
             services = services + ['php5-fpm']
-        elif self.app.pargs.mysql:
-            self.app.log.debug("mysql service stop")
-            services = services + ['mysql']
-        elif self.app.pargs.postfix:
-            self.app.log.debug("postfix service stop")
+        if self.app.pargs.mysql:
+            if EEVariables.ee_mysql_host is "localhost":
+                Log.debug(self, "mysql service stop")
+                services = services + ['mysql']
+            else:
+                Log.warn(self, "Remote MySQL found, "
+                               "unable to stop MySQL service")
+        if self.app.pargs.postfix:
+            Log.debug(self, "postfix service stop")
             services = services + ['postfix']
-        elif self.app.pargs.memcache:
-            self.app.log.debug("memcached service stop")
+        if self.app.pargs.memcache:
+            Log.debug(self, "memcached service stop")
             services = services + ['memcached']
-        elif self.app.pargs.dovecot:
-            self.app.log.debug("dovecot service stop")
+        if self.app.pargs.dovecot:
+            Log.debug(self, "dovecot service stop")
             services = services + ['dovecot']
-        else:
+        if not services and EEVariables.ee_mysql_host is "localhost":
             services = services + ['nginx', 'php5-fpm', 'mysql', 'postfix']
-            self.app.log.debug("nginx,php5-fpm,mysql,postfix services stop")
+            Log.debug(self, "nginx,php5-fpm,mysql,postfix services stop")
+        elif not services:
+            services = services + ['nginx', 'php5-fpm', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,postfix services stop")
         for service in services:
             EEService.stop_service(self, service)
 
-    @expose(help="restart stack services")
+    @expose(help="Restart stack services")
     def restart(self):
+        """Restart services"""
         services = []
         if self.app.pargs.nginx:
-            self.app.log.debug("nginx service restart")
+            Log.debug(self, "nginx service restart")
             services = services + ['nginx']
-        elif self.app.pargs.php:
-            self.app.log.debug("php5-fpm service restart")
+        if self.app.pargs.php:
+            Log.debug(self, "php5-fpm service restart")
             services = services + ['php5-fpm']
-        elif self.app.pargs.mysql:
-            self.app.log.debug("mysql service restart")
-            services = services + ['mysql']
-        elif self.app.pargs.postfix:
-            self.app.log.debug("postfix service restart")
+        if self.app.pargs.mysql:
+            if EEVariables.ee_mysql_host is "localhost":
+                Log.debug(self, "mysql service restart")
+                services = services + ['mysql']
+            else:
+                Log.warn(self, "Remote MySQL found, "
+                         "unable to restart MySQL service")
+        if self.app.pargs.postfix:
+            Log.debug(self, "postfix service restart")
             services = services + ['postfix']
-        elif self.app.pargs.memcache:
-            self.app.log.debug("memcached service restart")
+        if self.app.pargs.memcache:
+            Log.debug(self, "memcached service restart")
             services = services + ['memcached']
-        elif self.app.pargs.dovecot:
-            self.app.log.debug("dovecot service restart")
+        if self.app.pargs.dovecot:
+            Log.debug(self, "dovecot service restart")
             services = services + ['dovecot']
-        else:
+        if not services and EEVariables.ee_mysql_host is "localhost":
             services = services + ['nginx', 'php5-fpm', 'mysql', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,mysql,postfix services restart")
+        elif not services:
+            services = services + ['nginx', 'php5-fpm', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,postfix services restart")
         for service in services:
-            self.app.log.debug("nginx,php5-fpm,mysql,postfix services restart")
             EEService.restart_service(self, service)
 
-    @expose(help="get stack status")
+    @expose(help="Get stack status")
     def status(self):
+        """Status of services"""
         services = []
         if self.app.pargs.nginx:
-            self.app.log.debug("nginx service status")
+            Log.debug(self, "nginx service status")
             services = services + ['nginx']
-        elif self.app.pargs.php:
-            self.app.log.debug("php5-fpm service status")
+        if self.app.pargs.php:
+            Log.debug(self, "php5-fpm service status")
             services = services + ['php5-fpm']
-        elif self.app.pargs.mysql:
-            self.app.log.debug("mysql service status")
-            services = services + ['mysql']
-        elif self.app.pargs.postfix:
+        if self.app.pargs.mysql:
+            if EEVariables.ee_mysql_host is "localhost":
+                Log.debug(self, "mysql service status")
+                services = services + ['mysql']
+            else:
+                Log.warn(self, "Remote MySQL found, "
+                         "unable to get MySQL service status")
+        if self.app.pargs.postfix:
             services = services + ['postfix']
-            self.app.log.debug("postfix service status")
-        elif self.app.pargs.memcache:
-            self.app.log.debug("memcached service status")
+            Log.debug(self, "postfix service status")
+        if self.app.pargs.memcache:
+            Log.debug(self, "memcached service status")
             services = services + ['memcached']
-        elif self.app.pargs.dovecot:
-            self.app.log.debug("dovecot service status")
+        if self.app.pargs.dovecot:
+            Log.debug(self, "dovecot service status")
             services = services + ['dovecot']
-        else:
-            self.app.log.debug("nginx,php5-fpm,mysql,postfix services status")
+        if not services and EEVariables.ee_mysql_host is "localhost":
             services = services + ['nginx', 'php5-fpm', 'mysql', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,mysql,postfix services status")
+        elif not services:
+            services = services + ['nginx', 'php5-fpm', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,postfix services status")
         for service in services:
             if EEService.get_service_status(self, service):
-                print("{0}: Running".format(service))
+                Log.info(self, "{0:10}:  {1}".format(service, "Running"))
+
+    @expose(help="Reload stack services")
+    def reload(self):
+        """Reload service"""
+        services = []
+        if self.app.pargs.nginx:
+            Log.debug(self, "nginx service reload")
+            services = services + ['nginx']
+        if self.app.pargs.php:
+            Log.debug(self, "php5-fpm service reload")
+            services = services + ['php5-fpm']
+        if self.app.pargs.mysql:
+            if EEVariables.ee_mysql_host is "localhost":
+                Log.debug(self, "mysql service reload")
+                services = services + ['mysql']
+            else:
+                Log.warn(self, "Remote MySQL found, "
+                         "unable to remote MySQL service")
+        if self.app.pargs.postfix:
+            Log.debug(self, "postfix service reload")
+            services = services + ['postfix']
+        if self.app.pargs.memcache:
+            Log.debug(self, "memcached service reload")
+            services = services + ['memcached']
+        if self.app.pargs.dovecot:
+            Log.debug(self, "dovecot service reload")
+            services = services + ['dovecot']
+        if not services and EEVariables.ee_mysql_host is "localhost":
+            services = services + ['nginx', 'php5-fpm', 'mysql', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,mysql,postfix services reload")
+        elif not services:
+            services = services + ['nginx', 'php5-fpm', 'postfix']
+            Log.debug(self, "nginx,php5-fpm,postfix services reload")
+        for service in services:
+            EEService.reload_service(self, service)

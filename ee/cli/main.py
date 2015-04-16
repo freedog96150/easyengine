@@ -1,9 +1,21 @@
 """EasyEngine main application entry point."""
+import sys
+import os
+
+# this has to happen after you import sys, but before you import anything
+# from Cement "source: https://github.com/datafolklabs/cement/issues/290"
+if '--debug' in sys.argv:
+    sys.argv.remove('--debug')
+    TOGGLE_DEBUG = True
+else:
+    TOGGLE_DEBUG = False
 
 from cement.core import foundation
 from cement.utils.misc import init_defaults
 from cement.core.exc import FrameworkError, CaughtSignal
+from cement.ext.ext_argparse import ArgParseArgumentHandler
 from ee.core import exc
+from ee.cli.ext.ee_outputhandler import EEOutputHandler
 
 # Application default.  Should update config/ee.conf to reflect any
 # changes, or additions here.
@@ -18,14 +30,17 @@ defaults['ee']['plugin_dir'] = '/var/lib/ee/plugins'
 # External templates (generally, do not ship with application code)
 defaults['ee']['template_dir'] = '/var/lib/ee/templates'
 
+class EEArgHandler(ArgParseArgumentHandler):
+    class Meta:
+        label = 'ee_args_handler'
+
+    def error(self, message):
+        super(EEArgHandler, self).error("unknown args")
+
 
 class EEApp(foundation.CementApp):
     class Meta:
         label = 'ee'
-
-        # Log writing to file
-        defaults = init_defaults('ee', 'log.logging')
-        defaults['log.logging']['file'] = '/tmp/my.log'
 
         config_defaults = defaults
 
@@ -41,10 +56,14 @@ class EEApp(foundation.CementApp):
         # Internal plugins (ship with application code)
         plugin_bootstrap = 'ee.cli.plugins'
 
-        extensions = ['mustache', 'json']
+        extensions = ['mustache']
 
         # default output handler
-        output_handler = 'mustache'
+        output_handler = EEOutputHandler
+
+        arg_handler = EEArgHandler
+
+        debug = TOGGLE_DEBUG
 
 
 class EETestApp(EEApp):
@@ -64,6 +83,11 @@ def main():
         # Default our exit status to 0 (non-error)
         code = 0
 
+        # if not root...kick out
+        if not os.geteuid() == 0:
+            print("\nOnly root or sudo user can run this EasyEngine\n")
+            app.close(1)
+
         # Setup the application
         app.setup()
 
@@ -81,6 +105,9 @@ def main():
         # Default Cement signals are SIGINT and SIGTERM, exit 0 (non-error)
         code = 0
         print(e)
+    except Exception as e:
+        code = 1
+        print(e)
     finally:
         # Print an exception (if it occurred) and --debug was passed
         if app.debug:
@@ -91,8 +118,8 @@ def main():
             if exc_traceback is not None:
                 traceback.print_exc()
 
-        # Close the application
-        app.close(code)
+        # # Close the application
+    app.close(code)
 
 
 def get_test_app(**kw):
