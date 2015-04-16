@@ -1,3 +1,70 @@
+v 3.1.0 - April 16, 2015
+- Added HHVM  support #199
+- Added Pagespeed  support #473
+- EasyEngine log command now suppots more subcommand #448
+- Before stack purge or remove,  EasyEngine now asks confirmation #485
+- Minor fixes and improvements
+
+v 3.0.10 - April 10, 2015
+- Fixed regression issue introduced in 3.0.9
+
+v 3.0.9 - April 10, 2015
+- Fixed #483, now Xdebug is enabled during ee debug only and disabled by default
+- Introduced ee sync command to sync EasyEngine database with Site information
+- Minor fixes and improvement
+
+v 3.0.8 - April 9,2015
+- Fixed regression issue introduced in 3.0.7
+
+v 3.0.7 - April 9,2015
+- Fixed #445
+- Fixed #413
+- Small bug fixes.
+- Improvements in core functionality.
+
+v 3.0.6 - April 2,2015
+- Added `update` command to update EasyEngine.
+
+v 3.0.5 - March 18,2015
+- Changed Database from Percona MySQL to MariaDB #362
+- Better arguments for ee debug command
+- Improved installation script
+- Small bug fixes and improvements
+
+v 3.0.4 - Feb 25,2015
+- Fixed #406, install Wp Query Monitor on wp debug option
+- Fixed #429, added `log` command
+- Fixed #442
+- Fixed bug in delete command for site
+- Small bug fixes and improvements
+
+v 3.0.3 - Feb 23,2015
+- Fixed remote MySQL supports, #428, #427, thanks to @joshlyford #432
+- Fixed ascii encoding issue #414
+- Fixed bug in debug pool #426
+- Added admin tools to default stack
+- Added more MIME types,thanks to @cborgia #423
+- Small bugs fixes and improvements
+
+v 3.0.2 - Feb 14,2015
+- Fixed #413
+- Improved installation script
+- Fixed Percona key not importing
+- Small bug fixes and improvements
+
+v 3.0.1 - Feb 12,2015
+- Fixed #411, #40, #409
+- Improved installation script
+
+v 3.0.0 - Feb 11,2015
+- Refactored complete code in Python 3
+- Updated WP-CLI to 0.18
+- Update RoundCube to 1.1
+- Update ViMbAdmin to 3.0.11
+
+v 2.2.3 - Feb 01,2015
+- Fixed installation issue of Percona Mysql
+
 v 2.2.2 - Dec 03,2014
 - Fixed installation issue of Percona Mysql on Debian
 - Fixed error during ViMbAdmin installation
